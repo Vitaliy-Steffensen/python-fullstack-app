@@ -1,0 +1,71 @@
+# General OS and Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+*.log
+node_modules/
+
+# Python/Django specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+.env
+*.env
+venv/
+env/
+migrations/*  # Keep initial migrations, ignore new ones if needed
+!migrations/__init__.py  # Ensure migrations folder is tracked but empty
+
+# React specific
+node_modules/
+build/
+dist/
+*.cache
+.yarn/
+.pnp.*
+
+# Ignore local settings
+local_settings.py
+config/settings/local.py
+
+# Static and media files (Django)
+staticfiles/
+media/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Logs and debugging files
+logs/
+*.log
+debug.log
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Ignore AWS credentials if using AWS services
+.aws/
+
+# Ignore gunicorn logs
+gunicorn-error.log
+gunicorn-access.log
+
+# Ignore Celery beat schedule
+celerybeat-schedule
+
+# Ignore JetBrains IDE settings
+*.iml
