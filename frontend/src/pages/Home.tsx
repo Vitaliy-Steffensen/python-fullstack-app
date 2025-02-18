@@ -56,31 +56,55 @@ const Home = () => {
         <Note note={note} onDelete={deleteNote} key={note.id} />
       ))}
       <h2>Create a Note</h2>
-      <form onSubmit={createNote}>
-        <label htmlFor="title">Title:</label>
-        <br />
-        <input
-          type="text"
-          id="title"
-          name="title"
-          required
-          onChange={(e) => setTitle(e.target.value)}
-          value={title}
+      <div className="flex w-full max-w-lg items-start space-x-4 rounded-lg border p-4 shadow-sm focus-within:border-blue-500">
+        <img
+          className="w-10"
+          src="https://yt3.googleusercontent.com/R1vlhyGLOoLp2Ygon20Xm960qKA3nY85fPUB7jRyyjaU3Wl6J2nQCNYrFm8dta1CeuLT-5tP=s900-c-k-c0x00ffffff-no-rj"
+          alt=""
         />
-        <br />
-        <label htmlFor="content">Content:</label>
-        <br />
-        <textarea
-          id="content"
-          name="content"
-          required
-          onChange={(e) => setContent(e.target.value)}
-          value={content}
-          rows={4}
-          cols={50}
-        />
-        <input type="submit" value="submit" />
-      </form>
+
+        <form onSubmit={createNote}>
+          <div className="flex-1 space-y-2">
+            <div className="flex gap-2">
+              <label htmlFor="title">Title:</label>
+              <br />
+              <input
+                type="text"
+                id="title"
+                name="title"
+                required
+                onChange={(e) => setTitle(e.target.value)}
+                value={title}
+              />
+            </div>
+            <div>
+              <label htmlFor="content">Content:</label>
+              <br />
+              <textarea
+                className="w-full rounded-lg border border-none p-2 focus:ring focus:ring-0 focus:ring-blue-200 focus:outline-none"
+                id="content"
+                name="content"
+                required
+                onChange={(e) => setContent(e.target.value)}
+                value={content}
+                rows={4}
+                cols={50}
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end">
+              <button
+                disabled={!content.trim()}
+                value="submit"
+                className="focus-visible:outline-indigo-60 bg-primary-500 rounded-md px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
