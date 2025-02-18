@@ -1,7 +1,13 @@
 import { useState } from 'react';
-import api from '../api';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import api from '../api';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
+
+const authSchema = z.object({
+  username: z.string().min(3, 'Username must be at least 3 characters long'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
+});
 
 interface Props {
   route: string;
@@ -15,10 +21,17 @@ const AuthForm = ({ route, method }: Props) => {
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError('');
-    e.preventDefault();
+
+    const validation = authSchema.safeParse({ username, password });
+    if (!validation.success) {
+      setError(validation.error.errors.map((err) => err.message).join(', '));
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await api.post(route, { username, password });
@@ -30,8 +43,7 @@ const AuthForm = ({ route, method }: Props) => {
         navigate('/login');
       }
     } catch (error) {
-      alert(error);
-      setError('An error occoured');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -66,12 +78,12 @@ const AuthForm = ({ route, method }: Props) => {
           </div>
           <button
             type="submit"
-            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-60"
+            className="focus-visible:outline-indigo-60 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             {method}
           </button>
           {loading && 'Loading...'}
-          {error && <div className="error">{error}</div>}
+          {error && <div className="text-sm text-red-500">{error}</div>}
         </form>
       </div>
     </div>

@@ -19,4 +19,15 @@ class NoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = ["id", "title", "content", "created_at", "author"]
-        extra_kwargs = {"author": {"read_only": True}}
+        read_only_fields = ["id", "created_at", "author"]
+        extra_kwargs = {
+            "id": {"required": False}, 
+            "created_at": {"required": False}, 
+            "author": {"required": False}
+        }
+    
+    def create(self, validated_data):
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            validated_data["author"] = request.user
+        return super().create(validated_data)

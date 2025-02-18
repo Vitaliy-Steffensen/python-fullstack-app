@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import api from '../api';
+import { Api } from '../types/api';
 import Note from '../components/Note';
+import { ACCESS_TOKEN } from '../constants';
 
 export interface Note {
   id: number;
@@ -9,7 +10,11 @@ export interface Note {
   created_at: string;
 }
 
+const api = new Api({ baseUrl: import.meta.env.VITE_API_URL }).api;
+
 const Home = () => {
+  const token = localStorage.getItem(ACCESS_TOKEN);
+
   const [notes, setNotes] = useState<Note[]>([]);
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
@@ -20,7 +25,11 @@ const Home = () => {
 
   const getNotes = () => {
     api
-      .get('api/notes/')
+      .notesList({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => res.data)
       .then((data) => setNotes(data))
       .catch((error) => alert(error));
@@ -28,7 +37,11 @@ const Home = () => {
 
   const deleteNote = (id: number) => {
     api
-      .delete(`/api/notes/delete/${id}`)
+      .notesDeleteDestroy(id, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         if (res.status === 204) alert('Note deleted!');
         else alert('Failed to delete note.');
@@ -40,7 +53,14 @@ const Home = () => {
   const createNote = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     api
-      .post('api/notes/', { content, title })
+      .notesCreate(
+        { content, title },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
       .then((res) => {
         if (res.status === 201) alert('Note created!');
         else alert('Failed to make note.');
