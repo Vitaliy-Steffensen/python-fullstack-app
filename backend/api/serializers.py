@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Note
+from drf_spectacular.utils import extend_schema
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -20,12 +21,7 @@ class NoteSerializer(serializers.ModelSerializer):
         model = Note
         fields = ["id", "title", "content", "created_at", "author"]
         read_only_fields = ["id", "created_at", "author"]
-        extra_kwargs = {
-            "id": {"required": False}, 
-            "created_at": {"required": False}, 
-            "author": {"required": False}
-        }
-    
+
     def create(self, validated_data):
         request = self.context.get("request")
         if request and hasattr(request, "user"):

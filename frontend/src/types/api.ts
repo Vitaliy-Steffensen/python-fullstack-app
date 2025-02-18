@@ -19,15 +19,34 @@ export interface Note {
   author: number;
 }
 
+export interface NoteRequest {
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  title: string;
+  /** @minLength 1 */
+  content: string;
+}
+
 export interface TokenObtainPair {
-  username: string;
-  password: string;
   access: string;
   refresh: string;
 }
 
+export interface TokenObtainPairRequest {
+  /** @minLength 1 */
+  username: string;
+  /** @minLength 1 */
+  password: string;
+}
+
 export interface TokenRefresh {
   access: string;
+}
+
+export interface TokenRefreshRequest {
+  /** @minLength 1 */
   refresh: string;
 }
 
@@ -39,7 +58,20 @@ export interface User {
    * @pattern ^[\w.@+-]+$
    */
   username: string;
-  /** @maxLength 128 */
+}
+
+export interface UserRequest {
+  /**
+   * Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+   * @minLength 1
+   * @maxLength 150
+   * @pattern ^[\w.@+-]+$
+   */
+  username: string;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
   password: string;
 }
 
@@ -296,7 +328,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/notes/
      * @secure
      */
-    notesCreate: (data: Note, params: RequestParams = {}) =>
+    notesCreate: (data: NoteRequest, params: RequestParams = {}) =>
       this.request<Note, any>({
         path: `/api/notes/`,
         method: 'POST',
@@ -453,7 +485,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name TokenCreate
      * @request POST:/api/token/
      */
-    tokenCreate: (data: TokenObtainPair, params: RequestParams = {}) =>
+    tokenCreate: (data: TokenObtainPairRequest, params: RequestParams = {}) =>
       this.request<TokenObtainPair, any>({
         path: `/api/token/`,
         method: 'POST',
@@ -470,7 +502,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name TokenRefreshCreate
      * @request POST:/api/token/refresh/
      */
-    tokenRefreshCreate: (data: TokenRefresh, params: RequestParams = {}) =>
+    tokenRefreshCreate: (data: TokenRefreshRequest, params: RequestParams = {}) =>
       this.request<TokenRefresh, any>({
         path: `/api/token/refresh/`,
         method: 'POST',
@@ -488,7 +520,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/api/user/register/
      * @secure
      */
-    userRegisterCreate: (data: User, params: RequestParams = {}) =>
+    userRegisterCreate: (data: UserRequest, params: RequestParams = {}) =>
       this.request<User, any>({
         path: `/api/user/register/`,
         method: 'POST',
