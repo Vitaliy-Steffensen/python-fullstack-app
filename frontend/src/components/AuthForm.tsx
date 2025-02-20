@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import api from '../api';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '../constants';
+import { useAuth } from '../contexts/AuthProvider';
 
 const authSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters long'),
@@ -18,6 +18,7 @@ const AuthForm = ({ method }: Props) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,19 +37,22 @@ const AuthForm = ({ method }: Props) => {
     try {
       if (method === 'login') {
         const res = await api.tokenCreate({ username, password });
-        if (res.error) return alert('error');
-        localStorage.setItem(ACCESS_TOKEN, res.data.access);
-        localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+        if (res.error) {
+          setError('Invalid credentials');
+          return;
+        }
+        login(res.data.access, res.data.refresh);
         navigate('/');
       } else {
         const res = await api.userRegisterCreate({ username, password });
-        if (res.error) return alert('error');
-        localStorage.clear();
+        if (res.error) {
+          setError('Registration failed');
+          return;
+        }
         navigate('/login');
       }
-    } catch (error) {
+    } catch (_) {
       setError('An error occurred');
-      console.log(error);
     } finally {
       setLoading(false);
     }

@@ -3,6 +3,7 @@ import Note from '../components/Note';
 import { ACCESS_TOKEN } from '../constants';
 import api from '../api';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthProvider';
 
 export interface Note {
   id: number;
@@ -16,6 +17,7 @@ const Home = () => {
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   useEffect(() => {
     getNotes();
@@ -54,7 +56,7 @@ const Home = () => {
 
   const onLogoutClick = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    localStorage.clear();
+    logout();
     navigate('/login');
   };
 
