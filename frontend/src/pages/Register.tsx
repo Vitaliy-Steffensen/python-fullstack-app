@@ -1,5 +1,5 @@
 import AuthForm from '../components/AuthForm';
 
-const Register = () => <AuthForm route="/api/user/register/" method="register" />;
+const Register = () => <AuthForm method="register" />;
 
 export default Register;

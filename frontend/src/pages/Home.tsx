@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Api } from '../types/api';
 import Note from '../components/Note';
 import { ACCESS_TOKEN } from '../constants';
+import api from '../api';
+import { useNavigate } from 'react-router-dom';
 
 export interface Note {
   id: number;
@@ -10,14 +11,11 @@ export interface Note {
   created_at: string;
 }
 
-const api = new Api({ baseUrl: import.meta.env.VITE_API_URL }).api;
-
 const Home = () => {
-  const token = localStorage.getItem(ACCESS_TOKEN);
-
   const [notes, setNotes] = useState<Note[]>([]);
   const [content, setContent] = useState('');
   const [title, setTitle] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     getNotes();
@@ -25,11 +23,7 @@ const Home = () => {
 
   const getNotes = () => {
     api
-      .notesList({
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .notesList()
       .then((res) => res.data)
       .then((data) => setNotes(data))
       .catch((error) => alert(error));
@@ -37,11 +31,7 @@ const Home = () => {
 
   const deleteNote = (id: number) => {
     api
-      .notesDeleteDestroy(id, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .notesDeleteDestroy(id)
       .then((res) => {
         if (res.status === 204) alert('Note deleted!');
         else alert('Failed to delete note.');
@@ -53,14 +43,7 @@ const Home = () => {
   const createNote = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     api
-      .notesCreate(
-        { content, title },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
+      .notesCreate({ content, title })
       .then((res) => {
         if (res.status === 201) alert('Note created!');
         else alert('Failed to make note.');
@@ -69,8 +52,20 @@ const Home = () => {
       .catch((error) => alert(error));
   };
 
+  const onLogoutClick = (e: React.FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    localStorage.clear();
+    navigate('/login');
+  };
+
   return (
     <div>
+      <button
+        onClick={onLogoutClick}
+        className="focus-visible:outline-indigo-60 bg-primary-500 rounded-md px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2"
+      >
+        Logout
+      </button>
       <h2>Notes</h2>
       {notes.map((note) => (
         <Note note={note} onDelete={deleteNote} key={note.id} />

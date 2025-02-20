@@ -1,30 +1,35 @@
-import axios from 'axios';
 import { ACCESS_TOKEN } from './constants';
+import { Api } from './services/apiContract';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 console.log('API URL:', apiUrl);
 
-const api = axios.create({
-  baseURL: apiUrl,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
+const apiInstance = new Api({ baseUrl: import.meta.env.VITE_API_URL }).api;
+
+const api = new Proxy(apiInstance, {
+  get(target, prop, receiver) {
+    const originalMethod = Reflect.get(target, prop, receiver);
+    if (typeof originalMethod === 'function') {
+      return (...args: any[]) => {
+        const lastArg = args[args.length - 1];
+        const isParamsObject = typeof lastArg === 'object' && !Array.isArray(lastArg);
+
+        const params: RequestParams = isParamsObject ? lastArg : {};
+        const token = localStorage.getItem(ACCESS_TOKEN);
+
+        const updatedParams = {
+          ...params,
+          headers: {
+            ...(params.headers || {}),
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        };
+
+        return originalMethod(...args.slice(0, isParamsObject ? -1 : args.length), updatedParams);
+      };
+    }
+    return originalMethod;
   },
 });
-
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    console.error('Request error:', error);
-    return Promise.reject(error);
-  },
-);
 
 export default api;

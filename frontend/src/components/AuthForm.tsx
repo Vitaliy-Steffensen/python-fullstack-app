@@ -10,11 +10,10 @@ const authSchema = z.object({
 });
 
 interface Props {
-  route: string;
   method: 'login' | 'register';
 }
 
-const AuthForm = ({ route, method }: Props) => {
+const AuthForm = ({ method }: Props) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,20 +29,26 @@ const AuthForm = ({ route, method }: Props) => {
     if (!validation.success) {
       setError(validation.error.errors.map((err) => err.message).join(', '));
       setLoading(false);
+
       return;
     }
 
     try {
-      const res = await api.post(route, { username, password });
       if (method === 'login') {
+        const res = await api.tokenCreate({ username, password });
+        if (res.error) return alert('error');
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
         navigate('/');
       } else {
+        const res = await api.userRegisterCreate({ username, password });
+        if (res.error) return alert('error');
+        localStorage.clear();
         navigate('/login');
       }
-    } catch (error) {
+    } catch (error: any) {
       setError('An error occurred');
+      console.error(error);
     } finally {
       setLoading(false);
     }

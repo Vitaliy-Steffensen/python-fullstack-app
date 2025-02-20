@@ -17,8 +17,9 @@ export const ProtectedRoute: FC<Props> = ({ element }) => {
 
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+    if (!refreshToken) return alert('no refresh token');
     try {
-      const res = await api.post('/api/token/refresh/', {
+      const res = await api.tokenRefreshCreate({
         refresh: refreshToken,
       });
       if (res.status === 200) {

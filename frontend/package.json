@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-api-contract": "swagger-typescript-api -p http://localhost:8000/api/schema/ -o src/types --name api.ts"
+    "generate-api-contract": "swagger-typescript-api -p http://localhost:8000/api/schema/ -o src/services --name apiContract.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",

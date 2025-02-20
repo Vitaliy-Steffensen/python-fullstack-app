@@ -1,5 +1,5 @@
 import AuthForm from '../components/AuthForm';
 
-const Login = () => <AuthForm route="/api/token/" method="login" />;
+const Login = () => <AuthForm method="login" />;
 
 export default Login;

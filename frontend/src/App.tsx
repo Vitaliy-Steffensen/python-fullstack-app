@@ -5,16 +5,6 @@ import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// const Logout = () => {
-//   localStorage.clear();
-//   return <Navigate to="/login" />;
-// };
-
-// const RegisterAndLogout = () => {
-//   localStorage.clear();
-//   return <Register />;
-// };
-
 function App() {
   return (
     <Router>
