@@ -46,9 +46,9 @@ const AuthForm = ({ method }: Props) => {
         localStorage.clear();
         navigate('/login');
       }
-    } catch (error: any) {
+    } catch (error) {
       setError('An error occurred');
-      console.error(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }

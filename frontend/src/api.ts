@@ -1,34 +1,34 @@
 import { ACCESS_TOKEN } from './constants';
 import { Api } from './services/apiContract';
+import log from './services/log';
 
-const apiUrl = import.meta.env.VITE_API_URL;
-console.log('API URL:', apiUrl);
+const getToken = () => localStorage.getItem(ACCESS_TOKEN);
 
-const apiInstance = new Api({ baseUrl: import.meta.env.VITE_API_URL }).api;
+const apiInstance = new Api({
+  baseUrl: import.meta.env.VITE_API_URL,
+  securityWorker: async () => {
+    const token = getToken();
+    return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+  },
+}).api;
 
+// proxy which maps apiInstance to have automatically log errors with the logger
 const api = new Proxy(apiInstance, {
-  get(target, prop, receiver) {
+  get(target, prop: string, receiver) {
     const originalMethod = Reflect.get(target, prop, receiver);
+
     if (typeof originalMethod === 'function') {
-      return (...args: any[]) => {
-        const lastArg = args[args.length - 1];
-        const isParamsObject = typeof lastArg === 'object' && !Array.isArray(lastArg);
+      return async function (...args: unknown[]) {
+        try {
+          return await originalMethod.apply(target, args);
+        } catch (error: any) {
+          // Avoid logging unnecessary noise - 401 unothorized request
 
-        const params: RequestParams = isParamsObject ? lastArg : {};
-        const token = localStorage.getItem(ACCESS_TOKEN);
-
-        const updatedParams = {
-          ...params,
-          headers: {
-            ...(params.headers || {}),
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        };
-
-        return originalMethod(...args.slice(0, isParamsObject ? -1 : args.length), updatedParams);
+          if (error?.status !== 401) log.error(`API request failed: ${prop}`, { error });
+          throw error; // Re-throw to maintain existing behavior
+        }
       };
     }
-    return originalMethod;
   },
 });
 
