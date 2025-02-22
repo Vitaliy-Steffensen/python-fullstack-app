@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import api from '../api';
-import { useAuth } from '../contexts/AuthProvider';
+import { useAuthStore } from '../stores/useAuthStore';
 
 const authSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters long'),
@@ -18,7 +18,7 @@ const AuthForm = ({ method }: Props) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
-  const { login } = useAuth();
+  const { login } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {

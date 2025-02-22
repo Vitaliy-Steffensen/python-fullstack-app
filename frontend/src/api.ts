@@ -1,8 +1,8 @@
-import { ACCESS_TOKEN } from './constants';
 import { Api } from './services/apiContract';
 import log from './services/log';
+import { useAuthStore } from './stores/useAuthStore';
 
-const getToken = () => localStorage.getItem(ACCESS_TOKEN);
+const getToken = (): string | null => useAuthStore.getState().accessToken; // Explicitly typed
 
 const apiInstance = new Api({
   baseUrl: import.meta.env.VITE_API_URL,
